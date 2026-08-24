@@ -10,18 +10,69 @@
 <body>
     <h1>Steam Stat Analyzer</h1>
 
-    <p>
-        <form method="get">
-            <label for="steam_input">Steam ID:</label>
-            <input type="text" id="steam_input" name="steam_input">
-            <button type="submit">Analyze</button>
-        </form>
-        
-        {% if steam_id %}
-            <p>You entered Steam ID: {{ steam_id }}</p>
-        {% endif %}
+    <p>Analyze your Steam profile, games, achievements, and playtime.</p>
 
-    </p>
+    <div>
+        <h3>What should I enter?</h3>
 
+        <p>
+            Enter either your SteamID number or your Custom URL name.
+        </p>
+
+        <p>
+            <strong>To find these:</strong>
+            Open Steam → click your profile name → Profile → Edit Profile.
+        </p>
+
+        <p>
+            If you have a <strong>Custom URL</strong> set, enter the name shown
+            in the Custom URL box. For example, if your Custom URL is
+            <em>steamcommunity.com/id/johndoe</em>, enter <strong>johndoe</strong>.
+        </p>
+
+        <p>
+            If you don't have a Custom URL, you can copy your Steam profile URL
+            and paste it here instead.
+        </p>
+    </div>
+
+    <form method="get">
+        <label for="steam_input">
+            Steam profile name, URL, or SteamID:
+        </label>
+
+        <input
+            type="text"
+            id="steam_input"
+            name="steam_input"
+            placeholder="Steam vanity name or profile URL"
+            value="{{ steam_input|default:'' }}"
+        >
+
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+
+    {% if player %}
+        <hr>
+
+        <h2>{{ player.personaname }}</h2>
+
+        <img
+            src="{{ player.avatarfull }}"
+            alt="{{ player.personaname }} profile picture"
+        >
+
+        <p>Steam ID: {{ player.steamid }}</p>
+
+        <p>
+            <a href="{{ player.profileurl }}" target="_blank">
+                View Steam Profile
+            </a>
+        </p>
+    {% endif %}
 </body>
 </html>

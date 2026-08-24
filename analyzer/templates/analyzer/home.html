@@ -10,6 +10,18 @@
 <body>
     <h1>Steam Stat Analyzer</h1>
 
-    <p>Analyze your Steam library, achievements, and gaming statistics.</p>
+    <p>
+        <form method="get">
+            <label for="steam_input">Steam ID:</label>
+            <input type="text" id="steam_input" name="steam_input">
+            <button type="submit">Analyze</button>
+        </form>
+        
+        {% if steam_id %}
+            <p>You entered Steam ID: {{ steam_id }}</p>
+        {% endif %}
+
+    </p>
+
 </body>
 </html>

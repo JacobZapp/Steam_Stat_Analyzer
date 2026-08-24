@@ -59,3 +59,20 @@ def get_player_summary(steam_id):
         return players[0]
 
     return None
+
+def get_owned_games(steam_id):
+    url = f"{BASE_URL}/IPlayerService/GetOwnedGames/v1/"
+
+    params = {
+        "key": settings.STEAM_API_KEY,
+        "steamid": steam_id,
+        "include_appinfo": True,
+        "include_played_free_games": True,
+    }
+
+    response = requests.get(url, params=params, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    return data.get("response", {}).get("games", [])

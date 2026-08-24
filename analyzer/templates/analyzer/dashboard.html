@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Steam Stat Analyzer</title>
+</head>
+
+<body>
+    <header>
+        <h1>Steam Stat Analyzer</h1>
+
+        <nav>
+            <a href="{% url 'dashboard' %}">
+                Home
+            </a>
+
+            <a href="{% url 'profile_overview' user.steam_profile.steam_id %}">
+                My Profile
+            </a>
+
+            <form
+                method="post"
+                action="{% url 'logout' %}"
+                style="display: inline;"
+            >
+                {% csrf_token %}
+
+                <button type="submit">
+                    Logout
+                </button>
+            </form>
+        </nav>
+    </header>
+
+    <hr>
+
+    <main>
+        <section>
+            <h2>Leaderboard</h2>
+
+            <p>
+                Compare Steam stats with your friends.
+            </p>
+
+            <form method="get">
+                <label for="search">
+                    Search users:
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    placeholder="Search username or Steam name"
+                >
+
+                <button type="submit">
+                    Search
+                </button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Players</h2>
+
+            {% for profile in profiles %}
+                <div>
+                    <img
+                        src="{{ profile.avatar_url }}"
+                        alt="{{ profile.persona_name }} profile picture"
+                        width="64"
+                        height="64"
+                    >
+
+                    <strong>
+                        {{ profile.persona_name }}
+                    </strong>
+
+                    <span>
+                        @{{ profile.user.username }}
+                    </span>
+
+                    <a href="{% url 'profile_overview' profile.steam_id %}">
+                        View Stats
+                    </a>
+                </div>
+
+            {% empty %}
+                <p>No players have joined yet.</p>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>

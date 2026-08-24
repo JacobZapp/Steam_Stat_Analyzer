@@ -11,11 +11,20 @@
     <header>
         <h1>Steam Stat Analyzer</h1>
 
-        <p>
-            <a href="{% url 'home' %}">
-                Search another profile
+        <nav>
+            <a href="{% url 'dashboard' %}">
+                Home
             </a>
-        </p>
+
+            <form
+                method="post"
+                action="{% url 'logout' %}"
+                style="display: inline;"
+            >
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+        </nav>
     </header>
 
     <hr>

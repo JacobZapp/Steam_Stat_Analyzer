@@ -1,5 +1,5 @@
 import requests
-
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .services import (
@@ -11,30 +11,10 @@ from .services import (
 
 
 def home(request):
-    steam_input = request.GET.get("steam_input", "").strip()
-    error = None
+    if request.user.is_authenticated:
+        return redirect("dashboard")
 
-    if steam_input:
-        try:
-            steam_id = resolve_steam_id(steam_input)
-
-            if steam_id:
-                return redirect(
-                    "profile_overview",
-                    steam_id=steam_id,
-                )
-
-            error = "Could not find that Steam profile."
-
-        except requests.RequestException:
-            error = "Steam could not be reached. Please try again."
-
-    context = {
-        "steam_input": steam_input,
-        "error": error,
-    }
-
-    return render(request, "analyzer/home.html", context)
+    return redirect("login")
 
 def profile_overview(request, steam_id):
     player = None
@@ -156,5 +136,29 @@ def profile_overview(request, steam_id):
     return render(
         request,
         "analyzer/overview.html",
+        context,
+    )
+
+@login_required
+def dashboard(request):
+    from accounts.models import SteamProfile
+
+    search = request.GET.get("search", "").strip()
+
+    profiles = SteamProfile.objects.select_related("user").all()
+
+    if search:
+        profiles = profiles.filter(
+            persona_name__icontains=search
+        )
+
+    context = {
+        "profiles": profiles,
+        "search": search,
+    }
+
+    return render(
+        request,
+        "analyzer/dashboard.html",
         context,
     )

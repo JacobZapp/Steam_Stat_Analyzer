@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | Steam Stat Analyzer</title>
+</head>
+
+<body>
+    <h1>Create Account</h1>
+
+    <p>
+        Create your Steam Stat Analyzer account and link your Steam profile.
+    </p>
+
+    {% if form.errors %}
+        <div>
+            <h3>Account could not be created:</h3>
+
+            {{ form.errors }}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Create Account
+        </button>
+    </form>
+
+    <p>
+        Already have an account?
+        Login will be added next.
+    </p>
+</body>
+</html>

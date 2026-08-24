@@ -60,6 +60,7 @@ def get_player_summary(steam_id):
 
     return None
 
+
 def get_owned_games(steam_id):
     url = f"{BASE_URL}/IPlayerService/GetOwnedGames/v1/"
 
@@ -68,6 +69,23 @@ def get_owned_games(steam_id):
         "steamid": steam_id,
         "include_appinfo": True,
         "include_played_free_games": True,
+    }
+
+    response = requests.get(url, params=params, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    return data.get("response", {}).get("games", [])
+
+
+def get_recently_played_games(steam_id):
+    url = f"{BASE_URL}/IPlayerService/GetRecentlyPlayedGames/v1/"
+
+    params = {
+        "key": settings.STEAM_API_KEY,
+        "steamid": steam_id,
+        "count": 0,
     }
 
     response = requests.get(url, params=params, timeout=10)

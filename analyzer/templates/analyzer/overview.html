@@ -41,6 +41,43 @@
         <hr>
 
         <section>
+            <h2>Top 5 Games by Playtime</h2>
+
+            <ol>
+                {% for game in top_games %}
+                    <li>
+                        <strong>{{ game.name }}</strong>
+                        — {{ game.playtime_hours }} hours
+                    </li>
+                {% endfor %}
+            </ol>
+        </section>
+
+        <section>
+            <h2>Recent Activity</h2>
+
+            {% if recent_games %}
+                <p>
+                    <strong>{{ recent_hours }} hours</strong>
+                    played in the last two weeks.
+                </p>
+
+                <ul>
+                    {% for game in recent_games %}
+                        <li>
+                            <strong>{{ game.name }}</strong>
+                            — {{ game.recent_hours }} hours
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No recent playtime found.</p>
+            {% endif %}
+        </section>
+
+        <hr>
+
+        <section>
             <h2>Steam Overview</h2>
 
             <div>
@@ -54,27 +91,32 @@
             </div>
 
             <div>
-                <h3>Most Played Game</h3>
+                <h3>Games Played</h3>
+                <p>{{ played_games }}</p>
+            </div>
 
+            <div>
+                <h3>Never Played</h3>
+                <p>{{ unplayed_games }}</p>
+            </div>
+
+            <div>
+                <h3>Library Played</h3>
+                <p>{{ library_played_percent }}%</p>
+            </div>
+
+            <div>
+                <h3>Average Playtime</h3>
+                <p>{{ average_hours }} hours per played game</p>
+            </div>
+
+            <div>
+                <h3>Most Played Game</h3>
                 <p>
                     {{ most_played_game.name }}
-                    —
-                    {{ most_played_game.playtime_hours }} hours
+                    — {{ most_played_game.playtime_hours }} hours
                 </p>
             </div>
-        </section>
-
-        <section>
-            <h2>Top 5 Games by Playtime</h2>
-
-            <ol>
-                {% for game in top_games %}
-                    <li>
-                        <strong>{{ game.name }}</strong>
-                        — {{ game.playtime_hours }} hours
-                    </li>
-                {% endfor %}
-            </ol>
         </section>
     </main>
 </body>

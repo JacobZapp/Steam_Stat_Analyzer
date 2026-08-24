@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ player.personaname }} | Steam Stat Analyzer</title>
+</head>
+
+<body>
+    <header>
+        <h1>Steam Stat Analyzer</h1>
+
+        <p>
+            <a href="{% url 'home' %}">
+                Search another profile
+            </a>
+        </p>
+    </header>
+
+    <hr>
+
+    <main>
+        <section>
+            <h2>{{ player.personaname }}</h2>
+
+            <img
+                src="{{ player.avatarfull }}"
+                alt="{{ player.personaname }} profile picture"
+            >
+
+            <p>Steam ID: {{ player.steamid }}</p>
+
+            <p>
+                <a href="{{ player.profileurl }}" target="_blank">
+                    View Steam Profile
+                </a>
+            </p>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>Steam Overview</h2>
+
+            <div>
+                <h3>Games Owned</h3>
+                <p>{{ total_games }}</p>
+            </div>
+
+            <div>
+                <h3>Total Playtime</h3>
+                <p>{{ total_hours }} hours</p>
+            </div>
+
+            <div>
+                <h3>Most Played Game</h3>
+
+                <p>
+                    {{ most_played_game.name }}
+                    —
+                    {{ most_played_game.playtime_hours }} hours
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Top 5 Games by Playtime</h2>
+
+            <ol>
+                {% for game in top_games %}
+                    <li>
+                        <strong>{{ game.name }}</strong>
+                        — {{ game.playtime_hours }} hours
+                    </li>
+                {% endfor %}
+            </ol>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,6 +1,6 @@
 import requests
 
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from .services import (
     get_owned_games,
@@ -11,7 +11,31 @@ from .services import (
 
 def home(request):
     steam_input = request.GET.get("steam_input", "").strip()
+    error = None
 
+    if steam_input:
+        try:
+            steam_id = resolve_steam_id(steam_input)
+
+            if steam_id:
+                return redirect(
+                    "profile_overview",
+                    steam_id=steam_id,
+                )
+
+            error = "Could not find that Steam profile."
+
+        except requests.RequestException:
+            error = "Steam could not be reached. Please try again."
+
+    context = {
+        "steam_input": steam_input,
+        "error": error,
+    }
+
+    return render(request, "analyzer/home.html", context)
+
+def profile_overview(request, steam_id):
     player = None
     games = []
     total_games = 0
@@ -20,60 +44,55 @@ def home(request):
     top_games = []
     error = None
 
-    if steam_input:
-        try:
-            steam_id = resolve_steam_id(steam_input)
+    try:
+        player = get_player_summary(steam_id)
 
-            if not steam_id:
-                error = "Could not find that Steam profile."
+        if player is None:
+            error = "Could not find that Steam profile."
+
+        else:
+            games = get_owned_games(steam_id)
+
+            if games:
+                total_games = len(games)
+
+                # Steam stores lifetime playtime in minutes.
+                total_minutes = sum(
+                    game.get("playtime_forever", 0)
+                    for game in games
+                )
+
+                total_hours = round(total_minutes / 60, 1)
+
+                # Rank the library by lifetime playtime.
+                top_games = sorted(
+                    games,
+                    key=lambda game: game.get(
+                        "playtime_forever",
+                        0,
+                    ),
+                    reverse=True,
+                )[:5]
+
+                # Convert minutes to hours once for easier template display.
+                for game in top_games:
+                    game["playtime_hours"] = round(
+                        game.get("playtime_forever", 0) / 60,
+                        1,
+                    )
+
+                most_played_game = top_games[0]
 
             else:
-                player = get_player_summary(steam_id)
+                error = (
+                    "Profile found, but game data is unavailable. "
+                    "Make sure your Steam Game Details are public."
+                )
 
-                if player is None:
-                    error = "Could not find that Steam profile."
-
-                else:
-                    games = get_owned_games(steam_id)
-
-                    if games:
-                        total_games = len(games)
-
-                        # Steam returns playtime in minutes, so convert it to hours.
-                        total_minutes = sum(
-                            game.get("playtime_forever", 0)
-                            for game in games
-                        )
-
-                        total_hours = round(total_minutes / 60, 1)
-
-                        # Sort highest-to-lowest by lifetime playtime.
-                        top_games = sorted(
-                            games,
-                            key=lambda game: game.get("playtime_forever", 0),
-                            reverse=True,
-                        )[:5]
-
-                        most_played_game = top_games[0]
-
-                        # Add an easier-to-display hours value to each top game.
-                        for game in top_games:
-                            game["playtime_hours"] = round(
-                                game.get("playtime_forever", 0) / 60,
-                                1,
-                            )
-
-                    else:
-                        error = (
-                            "Profile found, but game data is unavailable. "
-                            "Make sure your Steam Game Details are public."
-                        )
-
-        except requests.RequestException as exc:
-            error = f"Steam API error: {exc}"
+    except requests.RequestException:
+        error = "Steam could not be reached. Please try again."
 
     context = {
-        "steam_input": steam_input,
         "player": player,
         "total_games": total_games,
         "total_hours": total_hours,
@@ -82,4 +101,8 @@ def home(request):
         "error": error,
     }
 
-    return render(request, "analyzer/home.html", context)
+    return render(
+        request,
+        "analyzer/overview.html",
+        context,
+    )

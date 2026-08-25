@@ -16,6 +16,7 @@ def home(request):
 
     return redirect("login")
 
+@login_required
 def profile_overview(request, steam_id):
     player = None
     games = []

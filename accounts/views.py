@@ -3,8 +3,10 @@ import requests
 from django.contrib.auth import login
 from django.shortcuts import redirect, render
 
+from .services import apply_steam_profile_stats
+
 from analyzer.services import (
-    get_player_summary,
+    get_steam_profile_stats,
     resolve_steam_id,
 )
 
@@ -38,22 +40,27 @@ def signup(request):
                     )
 
                 else:
-                    player = get_player_summary(steam_id)
+                    stats = get_steam_profile_stats(
+                        steam_id
+                    )
 
-                    if not player:
+                    if stats is None:
                         form.add_error(
                             "steam_input",
-                            "Could not load that Steam profile.",
+                            "Could not find that Steam profile.",
                         )
 
                     else:
                         user = form.save()
 
-                        SteamProfile.objects.create(
+                        steam_profile = SteamProfile.objects.create(
                             user=user,
                             steam_id=steam_id,
-                            persona_name=player["personaname"],
-                            avatar_url=player.get("avatarfull", ""),
+                        )
+
+                        apply_steam_profile_stats(
+                            steam_profile,
+                            stats,
                         )
 
                         login(request, user)

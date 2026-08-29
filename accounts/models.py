@@ -46,6 +46,10 @@ class SteamProfile(models.Model):
         default=0,
     )
 
+    stats_initialized = models.BooleanField(
+        default=False,
+    )
+
     updated_at = models.DateTimeField(
         auto_now=True,
     )

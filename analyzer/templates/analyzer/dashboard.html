@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard | Steam Stat Analyzer</title>
+    <title>Home | Steam Stat Analyzer</title>
 </head>
 
 <body>
@@ -32,64 +32,171 @@
                 </button>
             </form>
         </nav>
+
+        <p>
+            Logged in as <strong>{{ user.username }}</strong>
+        </p>
     </header>
 
     <hr>
 
     <main>
         <section>
-            <h2>Leaderboard</h2>
-
-            <p>
-                Compare Steam stats with your friends.
-            </p>
+            <h2>Find a Player</h2>
 
             <form method="get">
-                <label for="search">
-                    Search users:
-                </label>
-
                 <input
                     type="text"
-                    id="search"
                     name="search"
-                    placeholder="Search username or Steam name"
+                    value="{{ search }}"
+                    placeholder="Search Steam name"
+                >
+
+                <input
+                    type="hidden"
+                    name="sort"
+                    value="{{ sort }}"
                 >
 
                 <button type="submit">
                     Search
                 </button>
             </form>
+
+            {% if search %}
+                <p>
+                    Showing results for:
+                    <strong>{{ search }}</strong>
+                </p>
+
+                <a href="{% url 'dashboard' %}?sort={{ sort }}">
+                    Clear Search
+                </a>
+            {% endif %}
         </section>
+
+        <hr>
+
+        <section>
+            <h2>Leaderboard</h2>
+
+            <p>
+                Compare Steam stats with other registered players.
+            </p>
+
+            <nav>
+                <a href="?sort=hours">
+                    Total Playtime
+                </a>
+
+                |
+
+                <a href="?sort=games">
+                    Games Owned
+                </a>
+
+                |
+
+                <a href="?sort=played">
+                    Games Played
+                </a>
+
+                |
+
+                <a href="?sort=recent">
+                    Recent Playtime
+                </a>
+
+                |
+
+                <a href="?sort=library">
+                    Library Played
+                </a>
+            </nav>
+        </section>
+
+        <hr>
 
         <section>
             <h2>Players</h2>
 
-            {% for profile in profiles %}
-                <div>
-                    <img
-                        src="{{ profile.avatar_url }}"
-                        alt="{{ profile.persona_name }} profile picture"
-                        width="64"
-                        height="64"
-                    >
+            <ol>
+                {% for profile in profiles %}
+                    <li>
+                        <article>
+                            <img
+                                src="{{ profile.avatar_url }}"
+                                alt="{{ profile.persona_name }} profile picture"
+                                width="64"
+                                height="64"
+                            >
 
-                    <strong>
-                        {{ profile.persona_name }}
-                    </strong>
+                            <h3>
+                                {{ profile.persona_name }}
+                            </h3>
 
-                    <span>
-                        @{{ profile.user.username }}
-                    </span>
+                            <p>
+                                Site username:
+                                <strong>
+                                    {{ profile.user.username }}
+                                </strong>
+                            </p>
 
-                    <a href="{% url 'profile_overview' profile.steam_id %}">
-                        View Stats
-                    </a>
-                </div>
+                            {% if sort == "games" %}
+                                <p>
+                                    <strong>
+                                        {{ profile.total_games }}
+                                    </strong>
+                                    games owned
+                                </p>
 
-            {% empty %}
-                <p>No players have joined yet.</p>
-            {% endfor %}
+                            {% elif sort == "played" %}
+                                <p>
+                                    <strong>
+                                        {{ profile.games_played }}
+                                    </strong>
+                                    games played
+                                </p>
+
+                            {% elif sort == "recent" %}
+                                <p>
+                                    <strong>
+                                        {{ profile.recent_hours }}
+                                    </strong>
+                                    hours played recently
+                                </p>
+
+                            {% elif sort == "library" %}
+                                <p>
+                                    <strong>
+                                        {{ profile.library_played_percent }}%
+                                    </strong>
+                                    of library played
+                                </p>
+
+                            {% else %}
+                                <p>
+                                    <strong>
+                                        {{ profile.total_hours }}
+                                    </strong>
+                                    total hours
+                                </p>
+                            {% endif %}
+
+                            <p>
+                                <a href="{% url 'profile_overview' profile.steam_id %}">
+                                    View Stats
+                                </a>
+                            </p>
+                        </article>
+                    </li>
+
+                {% empty %}
+                    <p>
+                        No players found.
+                    </p>
+                {% endfor %}
+            </ol>
         </section>
     </main>
 </body>

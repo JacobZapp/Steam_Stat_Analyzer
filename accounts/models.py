@@ -3,7 +3,7 @@ from django.db import models
 
 
 class SteamProfile(models.Model):
-    user = models.OneToOneField( #made sure to make it so one account can only have one steam profile and vice versa
+    user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name="steam_profile",
@@ -20,6 +20,34 @@ class SteamProfile(models.Model):
 
     avatar_url = models.URLField(
         blank=True,
+    )
+
+    total_games = models.PositiveIntegerField(
+        default=0,
+    )
+
+    games_played = models.PositiveIntegerField(
+        default=0,
+    )
+
+    total_hours = models.FloatField(
+        default=0,
+    )
+
+    recent_hours = models.FloatField(
+        default=0,
+    )
+
+    library_played_percent = models.FloatField(
+        default=0,
+    )
+
+    average_hours = models.FloatField(
+        default=0,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
     )
 
     def __str__(self):

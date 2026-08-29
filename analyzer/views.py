@@ -45,6 +45,20 @@ def profile_overview(request, steam_id):
             if games:
                 total_games = len(games)
 
+                played_games = sum(
+                    1
+                    for game in games
+                    if game.get("playtime_forever", 0) > 0
+                )
+
+                unplayed_games = total_games - played_games
+
+                if total_games > 0:
+                    library_played_percent = round(
+                        (played_games / total_games) * 100,
+                        1,
+                    )
+
                 # Steam stores lifetime playtime in minutes.
                 total_minutes = sum(
                     game.get("playtime_forever", 0)

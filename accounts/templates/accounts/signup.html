@@ -1,28 +1,64 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Create Account | Steam Stat Analyzer</title>
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Create Account | Steam Stat Analyzer
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'analyzer/styles.css' %}"
+    >
+
 </head>
 
-<body>
-    <h1>Create Account</h1>
 
-    <p>
-        Create your Steam Stat Analyzer account and link your Steam profile.
+<body class="auth-page">
+
+<main class="auth-card">
+
+    <h1>
+        Steam Stat Analyzer
+    </h1>
+
+    <h2>
+        Create Account
+    </h2>
+
+    <p class="muted">
+        Create an account and link your Steam
+        profile to start tracking your stats.
     </p>
 
+
     {% if form.errors %}
+
         <div>
-            <h3>Account could not be created:</h3>
+
+            <h3>
+                Account could not be created:
+            </h3>
 
             {{ form.errors }}
+
         </div>
+
     {% endif %}
 
+
     <form method="post">
+
         {% csrf_token %}
 
         {{ form.as_p }}
@@ -30,11 +66,20 @@
         <button type="submit">
             Create Account
         </button>
+
     </form>
+
 
     <p>
         Already have an account?
-        Login will be added next.
+
+        <a href="{% url 'login' %}">
+            Login
+        </a>
     </p>
+
+</main>
+
 </body>
+
 </html>

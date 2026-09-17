@@ -1,17 +1,34 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Home | Steam Stat Analyzer</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'analyzer/styles.css' %}"
+    >
 </head>
 
 <body>
-    <header>
-        <h1>Steam Stat Analyzer</h1>
 
-        <nav>
+<header class="site-header">
+    <div class="header-content">
+
+        <h1 class="site-title">
+            Steam Stat Analyzer
+        </h1>
+
+        <nav class="main-nav">
+
             <a href="{% url 'dashboard' %}">
                 Home
             </a>
@@ -23,190 +40,240 @@
             <form
                 method="post"
                 action="{% url 'logout' %}"
-                style="display: inline;"
             >
                 {% csrf_token %}
 
-                <button type="submit">
+                <button
+                    class="logout-button"
+                    type="submit"
+                >
                     Logout
                 </button>
             </form>
+
         </nav>
 
-        <p>
-            Logged in as <strong>{{ user.username }}</strong>
+    </div>
+</header>
+
+
+<main class="container">
+
+    <div class="page-heading">
+        <h2>Leaderboard</h2>
+
+        <p class="muted">
+            Logged in as {{ user.username }}
         </p>
-    </header>
+    </div>
 
-    <hr>
 
-    <main>
-        <section>
-            <h2>Find a Player</h2>
+    <section class="panel">
 
-            <form method="get">
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ search }}"
-                    placeholder="Search Steam name"
-                >
+        <h2>Find a Player</h2>
 
-                <input
-                    type="hidden"
-                    name="sort"
-                    value="{{ sort }}"
-                >
+        <form
+            method="get"
+            class="search-form"
+        >
+            <input
+                type="text"
+                name="search"
+                value="{{ search }}"
+                placeholder="Search Steam name"
+            >
 
-                <button type="submit">
-                    Search
-                </button>
-            </form>
+            <input
+                type="hidden"
+                name="sort"
+                value="{{ sort }}"
+            >
 
-            {% if search %}
-                <p>
-                    Showing results for:
-                    <strong>{{ search }}</strong>
-                </p>
+            <button
+                class="primary-button"
+                type="submit"
+            >
+                Search
+            </button>
+        </form>
 
-                <a href="{% url 'dashboard' %}?sort={{ sort }}">
-                    Clear Search
-                </a>
-            {% endif %}
-        </section>
+        {% if search %}
 
-        <hr>
+            <p class="muted">
+                Showing results for:
+                <strong>{{ search }}</strong>
+            </p>
 
-  <section>
-    <h2>Leaderboard</h2>
+            <a href="{% url 'dashboard' %}?sort={{ sort }}">
+                Clear Search
+            </a>
 
-    <p>
-        Compare Steam stats with other registered players.
-    </p>
+        {% endif %}
 
-    <nav>
-        <a href="?sort=hours">
-            Total Playtime
-        </a>
+    </section>
 
-        |
 
-        <a href="?sort=games">
-            Games Owned
-        </a>
+    <section class="panel">
 
-        |
+        <h2>Player Rankings</h2>
 
-        <a href="?sort=played">
-            Games Played
-        </a>
+        <div class="sort-links">
 
-        |
-        
-        <a href="?sort=achievements">
-            Achievements
-        </a>
+            <a
+                href="?sort=hours"
+                class="{% if sort == 'hours' %}active{% endif %}"
+            >
+                Total Playtime
+            </a>
 
-        |
+            <a
+                href="?sort=games"
+                class="{% if sort == 'games' %}active{% endif %}"
+            >
+                Games Owned
+            </a>
 
-        <a href="?sort=recent">
-            Recent Playtime
-        </a>
+            <a
+                href="?sort=played"
+                class="{% if sort == 'played' %}active{% endif %}"
+            >
+                Games Played
+            </a>
 
-        |
+            <a
+                href="?sort=recent"
+                class="{% if sort == 'recent' %}active{% endif %}"
+            >
+                Recent Playtime
+            </a>
 
-        <a href="?sort=library">
-            Library Played
-        </a>
-    </nav>
+            <a
+                href="?sort=library"
+                class="{% if sort == 'library' %}active{% endif %}"
+            >
+                Library Played
+            </a>
 
-    <br>
+            <a
+                href="?sort=achievements"
+                class="{% if sort == 'achievements' %}active{% endif %}"
+            >
+                Achievements
+            </a>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Player</th>
-                <th>Total Hours</th>
-                <th>Games Owned</th>
-                <th>Games Played</th>
-                <th>Achievements</th>
-                <th>Library Played</th>
-                <th>Recent Hours</th>
-                <th>Average Hours</th>
-                <th>Profile</th>
-            </tr>
-        </thead>
+        </div>
 
-        <tbody>
-            {% for profile in profiles %}
-                <tr>
-                    <td>
-                        #{{ forloop.counter }}
-                    </td>
 
-                    <td>
-                        <img
-                            src="{{ profile.avatar_url }}"
-                            alt="{{ profile.persona_name }} profile picture"
-                            width="48"
-                            height="48"
-                        >
+        <div class="table-wrapper">
 
-                        <strong>
-                            {{ profile.persona_name }}
-                        </strong>
+            <table class="leaderboard-table">
 
-                        <span>
-                            @{{ profile.user.username }}
-                        </span>
-                    </td>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Total Hours</th>
+                        <th>Games Owned</th>
+                        <th>Games Played</th>
+                        <th>Achievements</th>
+                        <th>Library Played</th>
+                        <th>Recent Hours</th>
+                        <th>Average Hours</th>
+                        <th>Profile</th>
+                    </tr>
+                </thead>
 
-                    <td>
-                        {{ profile.total_hours }}
-                    </td>
+                <tbody>
 
-                    <td>
-                        {{ profile.total_games }}
-                    </td>
+                    {% for profile in profiles %}
 
-                    <td>
-                        {{ profile.games_played }}
-                    </td>
-                    
-                    <td>
-                        {{ profile.total_achievements }}
-                    </td>
+                        <tr>
 
-                    <td>
-                        {{ profile.library_played_percent }}%
-                    </td>
+                            <td class="rank">
+                                #{{ forloop.counter }}
+                            </td>
 
-                    <td>
-                        {{ profile.recent_hours }}
-                    </td>
+                            <td>
 
-                    <td>
-                        {{ profile.average_hours }}
-                    </td>
+                                <div class="player-cell">
 
-                    <td>
-                        <a href="{% url 'profile_overview' profile.steam_id %}">
-                            View Stats
-                        </a>
-                    </td>
-                </tr>
+                                    <img
+                                        class="player-avatar"
+                                        src="{{ profile.avatar_url }}"
+                                        alt="{{ profile.persona_name }}"
+                                    >
 
-            {% empty %}
-                <tr>
-                    <td colspan="9">
-                        No players found.
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</section>
-    </main>
+                                    <div class="player-info">
+
+                                        <span class="player-name">
+                                            {{ profile.persona_name }}
+                                        </span>
+
+                                        <span class="site-username">
+                                            @{{ profile.user.username }}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td class="stat-value">
+                                {{ profile.total_hours }}
+                            </td>
+
+                            <td class="stat-value">
+                                {{ profile.total_games }}
+                            </td>
+
+                            <td class="stat-value">
+                                {{ profile.games_played }}
+                            </td>
+
+                            <td class="stat-value">
+                                {{ profile.total_achievements }}
+                            </td>
+
+                            <td class="stat-value">
+                                {{ profile.library_played_percent }}%
+                            </td>
+
+                            <td class="stat-value">
+                                {{ profile.recent_hours }}
+                            </td>
+
+                            <td class="stat-value">
+                                {{ profile.average_hours }}
+                            </td>
+
+                            <td>
+                                <a href="{% url 'profile_overview' profile.steam_id %}">
+                                    View Stats
+                                </a>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="10">
+                                No players found.
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
 </body>
 </html>

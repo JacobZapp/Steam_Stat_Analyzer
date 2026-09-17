@@ -1,17 +1,43 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ player.personaname }} | Steam Stat Analyzer</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% if player %}
+            {{ player.personaname }} | Steam Stat Analyzer
+        {% else %}
+            Steam Profile | Steam Stat Analyzer
+        {% endif %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'analyzer/styles.css' %}"
+    >
 </head>
 
-<body>
-    <header>
-        <h1>Steam Stat Analyzer</h1>
 
-        <nav>
+<body>
+
+<header class="site-header">
+
+    <div class="header-content">
+
+        <h1 class="site-title">
+            Steam Stat Analyzer
+        </h1>
+
+        <nav class="main-nav">
+
             <a href="{% url 'dashboard' %}">
                 Home
             </a>
@@ -19,125 +45,284 @@
             <form
                 method="post"
                 action="{% url 'logout' %}"
-                style="display: inline;"
             >
                 {% csrf_token %}
-                
-                <button type="submit">Logout</button>
+
+                <button
+                    class="logout-button"
+                    type="submit"
+                >
+                    Logout
+                </button>
+
             </form>
+
         </nav>
-    </header>
 
-    <hr>
+    </div>
 
-    <main>
-        <section>
-            <h2>{{ player.personaname }}</h2>
+</header>
+
+
+<main class="container">
+
+    {% if error %}
+
+        <section class="panel">
+
+            <h2>Profile Error</h2>
+
+            <p>
+                {{ error }}
+            </p>
+
+            <a href="{% url 'dashboard' %}">
+                Return Home
+            </a>
+
+        </section>
+
+    {% endif %}
+
+
+    {% if player %}
+
+        <section class="panel profile-header">
 
             <img
+                class="profile-avatar"
                 src="{{ player.avatarfull }}"
                 alt="{{ player.personaname }} profile picture"
             >
 
-            <p>Steam ID: {{ player.steamid }}</p>
+            <div>
 
-            <p>
-                <a href="{{ player.profileurl }}" target="_blank">
+                <h2>
+                    {{ player.personaname }}
+                </h2>
+
+                <p class="muted">
+                    Steam ID:
+                    {{ player.steamid }}
+                </p>
+
+                <a
+                    href="{{ player.profileurl }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     View Steam Profile
                 </a>
-            </p>
+
+            </div>
+
         </section>
 
-        <hr>
 
-        <section>
-            <h2>Top 5 Games by Playtime</h2>
+        <section class="panel">
 
-            <ol>
-                {% for game in top_games %}
-                    <li>
-                        <strong>{{ game.name }}</strong>
-                        — {{ game.playtime_hours }} hours
-                    </li>
-                {% endfor %}
-            </ol>
+            <h2>
+                Top 5 Games by Playtime
+            </h2>
+
+            {% if top_games %}
+
+                <ol class="game-list">
+
+                    {% for game in top_games %}
+
+                        <li>
+                            <strong>
+                                {{ game.name }}
+                            </strong>
+
+                            —
+                            {{ game.playtime_hours }}
+                            hours
+                        </li>
+
+                    {% endfor %}
+
+                </ol>
+
+            {% else %}
+
+                <p class="muted">
+                    No game data available.
+                </p>
+
+            {% endif %}
+
         </section>
 
-        <section>
-            <h2>Recent Activity</h2>
+
+        <section class="panel">
+
+            <h2>
+                Recent Activity
+            </h2>
 
             {% if recent_games %}
+
                 <p>
-                    <strong>{{ recent_hours }} hours</strong>
+                    <strong>
+                        {{ recent_hours }} hours
+                    </strong>
+
                     played in the last two weeks.
                 </p>
 
-                <ul>
+
+                <ul class="game-list">
+
                     {% for game in recent_games %}
+
                         <li>
-                            <strong>{{ game.name }}</strong>
-                            — {{ game.recent_hours }} hours
+
+                            <strong>
+                                {{ game.name }}
+                            </strong>
+
+                            —
+                            {{ game.recent_hours }}
+                            hours
+
                         </li>
+
                     {% endfor %}
+
                 </ul>
+
             {% else %}
-                <p>No recent playtime found.</p>
-            {% endif %}
-        </section>
 
-        <hr>
-
-        <section>
-            <h2>Steam Overview</h2>
-
-            <div>
-                <h3>Games Owned</h3>
-                <p>{{ total_games }}</p>
-            </div>
-
-            <div>
-                <h3>Total Playtime</h3>
-                <p>{{ total_hours }} hours</p>
-            </div>
-
-            <div>
-                <h3>Total Achievements</h3>
-
-                {% if total_achievements is not None %}
-                    <p>{{ total_achievements }}</p>
-                {% else %}
-                    <p>Private</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <h3>Games Played</h3>
-                <p>{{ played_games }}</p>
-            </div>
-
-            <div>
-                <h3>Never Played</h3>
-                <p>{{ unplayed_games }}</p>
-            </div>
-
-            <div>
-                <h3>Library Played</h3>
-                <p>{{ library_played_percent }}%</p>
-            </div>
-
-            <div>
-                <h3>Average Playtime</h3>
-                <p>{{ average_hours }} hours per played game</p>
-            </div>
-
-            <div>
-                <h3>Most Played Game</h3>
-                <p>
-                    {{ most_played_game.name }}
-                    — {{ most_played_game.playtime_hours }} hours
+                <p class="muted">
+                    No recent playtime found.
                 </p>
-            </div>
+
+            {% endif %}
+
         </section>
-    </main>
+
+
+        <section class="panel">
+
+            <h2>
+                Steam Overview
+            </h2>
+
+            <div class="stat-grid">
+
+                <div class="stat-card">
+
+                    <h3>
+                        Total Hours
+                    </h3>
+
+                    <p>
+                        {{ total_hours }}
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h3>
+                        Games Owned
+                    </h3>
+
+                    <p>
+                        {{ total_games }}
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h3>
+                        Games Played
+                    </h3>
+
+                    <p>
+                        {{ played_games }}
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h3>
+                        Never Played
+                    </h3>
+
+                    <p>
+                        {{ unplayed_games }}
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h3>
+                        Library Played
+                    </h3>
+
+                    <p>
+                        {{ library_played_percent }}%
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h3>
+                        Average Hours
+                    </h3>
+
+                    <p>
+                        {{ average_hours }}
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h3>
+                        Recent Hours
+                    </h3>
+
+                    <p>
+                        {{ recent_hours }}
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h3>
+                        Achievements
+                    </h3>
+
+                    <p>
+                        {{ total_achievements }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+</main>
+
 </body>
+
 </html>

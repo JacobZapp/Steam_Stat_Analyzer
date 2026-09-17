@@ -202,3 +202,96 @@ def get_steam_profile_stats(steam_id):
         "recent_games": recent_games,
         "recent_hours": recent_hours,
     }
+
+def get_player_achievements(
+    steam_id,
+    app_id,
+    session=None,
+):
+    url = (
+        f"{BASE_URL}/"
+        "ISteamUserStats/"
+        "GetPlayerAchievements/v1/"
+    )
+
+    params = {
+        "key": settings.STEAM_API_KEY,
+        "steamid": steam_id,
+        "appid": app_id,
+        "l": "english",
+    }
+
+    requester = session or requests
+
+    response = requester.get(
+        url,
+        params=params,
+        timeout=10,
+    )
+
+    # Some games do not expose achievement/stat data.
+    if response.status_code in (400, 404):
+        return []
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    player_stats = data.get(
+        "playerstats",
+        {},
+    )
+
+    return player_stats.get(
+        "achievements",
+        [],
+    )
+
+
+def get_total_achievements_earned(
+    steam_id,
+    games=None,
+):
+    if games is None:
+        games = get_owned_games(
+            steam_id
+        )
+
+    total_achievements = 0
+
+    with requests.Session() as session:
+        for game in games:
+            if game.get(
+                "playtime_forever",
+                0,
+            ) <= 0:
+                continue
+
+            if game.get(
+                "has_community_visible_stats"
+            ) is False:
+                continue
+
+            app_id = game.get("appid")
+
+            if not app_id:
+                continue
+
+            achievements = get_player_achievements(
+                steam_id,
+                app_id,
+                session=session,
+            )
+
+            earned = sum(
+                1
+                for achievement in achievements
+                if achievement.get(
+                    "achieved",
+                    0,
+                )
+            )
+
+            total_achievements += earned
+
+    return total_achievements

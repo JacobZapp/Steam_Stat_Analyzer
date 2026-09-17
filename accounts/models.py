@@ -54,5 +54,13 @@ class SteamProfile(models.Model):
         auto_now=True,
     )
 
+    total_achievements = models.PositiveIntegerField(
+    default=0,
+    )
+
+    achievements_initialized = models.BooleanField(
+    default=False,
+    )
+
     def __str__(self):
         return f"{self.user.username} - {self.persona_name}"

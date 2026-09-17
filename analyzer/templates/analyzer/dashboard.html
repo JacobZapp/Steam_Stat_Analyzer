@@ -77,127 +77,136 @@
 
         <hr>
 
-        <section>
-            <h2>Leaderboard</h2>
+  <section>
+    <h2>Leaderboard</h2>
 
-            <p>
-                Compare Steam stats with other registered players.
-            </p>
+    <p>
+        Compare Steam stats with other registered players.
+    </p>
 
-            <nav>
-                <a href="?sort=hours">
-                    Total Playtime
-                </a>
+    <nav>
+        <a href="?sort=hours">
+            Total Playtime
+        </a>
 
-                |
+        |
 
-                <a href="?sort=games">
-                    Games Owned
-                </a>
+        <a href="?sort=games">
+            Games Owned
+        </a>
 
-                |
+        |
 
-                <a href="?sort=played">
-                    Games Played
-                </a>
+        <a href="?sort=played">
+            Games Played
+        </a>
 
-                |
+        |
+        
+        <a href="?sort=achievements">
+            Achievements
+        </a>
 
-                <a href="?sort=recent">
-                    Recent Playtime
-                </a>
+        |
 
-                |
+        <a href="?sort=recent">
+            Recent Playtime
+        </a>
 
-                <a href="?sort=library">
-                    Library Played
-                </a>
-            </nav>
-        </section>
+        |
 
-        <hr>
+        <a href="?sort=library">
+            Library Played
+        </a>
+    </nav>
 
-        <section>
-            <h2>Players</h2>
+    <br>
 
-            <ol>
-                {% for profile in profiles %}
-                    <li>
-                        <article>
-                            <img
-                                src="{{ profile.avatar_url }}"
-                                alt="{{ profile.persona_name }} profile picture"
-                                width="64"
-                                height="64"
-                            >
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Total Hours</th>
+                <th>Games Owned</th>
+                <th>Games Played</th>
+                <th>Achievements</th>
+                <th>Library Played</th>
+                <th>Recent Hours</th>
+                <th>Average Hours</th>
+                <th>Profile</th>
+            </tr>
+        </thead>
 
-                            <h3>
-                                {{ profile.persona_name }}
-                            </h3>
+        <tbody>
+            {% for profile in profiles %}
+                <tr>
+                    <td>
+                        #{{ forloop.counter }}
+                    </td>
 
-                            <p>
-                                Site username:
-                                <strong>
-                                    {{ profile.user.username }}
-                                </strong>
-                            </p>
+                    <td>
+                        <img
+                            src="{{ profile.avatar_url }}"
+                            alt="{{ profile.persona_name }} profile picture"
+                            width="48"
+                            height="48"
+                        >
 
-                            {% if sort == "games" %}
-                                <p>
-                                    <strong>
-                                        {{ profile.total_games }}
-                                    </strong>
-                                    games owned
-                                </p>
+                        <strong>
+                            {{ profile.persona_name }}
+                        </strong>
 
-                            {% elif sort == "played" %}
-                                <p>
-                                    <strong>
-                                        {{ profile.games_played }}
-                                    </strong>
-                                    games played
-                                </p>
+                        <span>
+                            @{{ profile.user.username }}
+                        </span>
+                    </td>
 
-                            {% elif sort == "recent" %}
-                                <p>
-                                    <strong>
-                                        {{ profile.recent_hours }}
-                                    </strong>
-                                    hours played recently
-                                </p>
+                    <td>
+                        {{ profile.total_hours }}
+                    </td>
 
-                            {% elif sort == "library" %}
-                                <p>
-                                    <strong>
-                                        {{ profile.library_played_percent }}%
-                                    </strong>
-                                    of library played
-                                </p>
+                    <td>
+                        {{ profile.total_games }}
+                    </td>
 
-                            {% else %}
-                                <p>
-                                    <strong>
-                                        {{ profile.total_hours }}
-                                    </strong>
-                                    total hours
-                                </p>
-                            {% endif %}
+                    <td>
+                        {{ profile.games_played }}
+                    </td>
+                    
+                    <td>
+                        {{ profile.total_achievements }}
+                    </td>
 
-                            <p>
-                                <a href="{% url 'profile_overview' profile.steam_id %}">
-                                    View Stats
-                                </a>
-                            </p>
-                        </article>
-                    </li>
+                    <td>
+                        {{ profile.library_played_percent }}%
+                    </td>
 
-                {% empty %}
-                    <p>
+                    <td>
+                        {{ profile.recent_hours }}
+                    </td>
+
+                    <td>
+                        {{ profile.average_hours }}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'profile_overview' profile.steam_id %}">
+                            View Stats
+                        </a>
+                    </td>
+                </tr>
+
+            {% empty %}
+                <tr>
+                    <td colspan="9">
                         No players found.
-                    </p>
-                {% endfor %}
-            </ol>
-        </section>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
     </main>
 </body>
 </html>

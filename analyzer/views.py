@@ -4,7 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from accounts.models import SteamProfile
-from accounts.services import refresh_steam_profile
+
+from accounts.services import (
+    refresh_steam_achievements,
+    refresh_steam_profile,
+)
 
 from .services import get_steam_profile_stats
 
@@ -22,6 +26,7 @@ def profile_overview(request, steam_id):
         "total_hours": 0,
         "most_played_game": None,
         "top_games": [],
+        "total_achievements": None,
 
         "played_games": 0,
         "unplayed_games": 0,
@@ -33,6 +38,14 @@ def profile_overview(request, steam_id):
 
         "error": None,
     }
+
+    stored_profile = SteamProfile.objects.filter(
+        steam_id=steam_id
+    ).first()
+
+    context["total_achievements"] = (
+        stored_profile.total_achievements
+    )
 
     try:
         stored_profile = SteamProfile.objects.filter(
@@ -88,6 +101,17 @@ def dashboard(request):
         except requests.RequestException:
             pass
 
+    unitialized_achievements = SteamProfile.objects.filter(
+        achievements_initialized=False
+    )
+
+    for profile in unitialized_achievements:
+        try:
+            refresh_steam_achievements(profile)
+
+        except requests.RequestException:
+            pass
+
     search = request.GET.get("search", "").strip()
     sort = request.GET.get("sort", "hours")
 
@@ -116,6 +140,11 @@ def dashboard(request):
     elif sort == "library":
         profiles = profiles.order_by(
             "-library_played_percent"
+        )
+
+    elif sort == "achievements":
+        profiles = profiles.order_by(
+            "-total_achievements"
         )
 
     else:

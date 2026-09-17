@@ -101,6 +101,16 @@
             </div>
 
             <div>
+                <h3>Total Achievements</h3>
+
+                {% if total_achievements is not None %}
+                    <p>{{ total_achievements }}</p>
+                {% else %}
+                    <p>Private</p>
+                {% endif %}
+            </div>
+
+            <div>
                 <h3>Games Played</h3>
                 <p>{{ played_games }}</p>
             </div>

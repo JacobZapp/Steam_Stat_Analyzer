@@ -1,5 +1,7 @@
-from analyzer.services import get_steam_profile_stats
-
+from analyzer.services import (
+    get_steam_profile_stats,
+    get_total_achievements_earned,
+)
 
 def apply_steam_profile_stats(steam_profile, stats):
     player = stats["player"]
@@ -42,3 +44,22 @@ def refresh_steam_profile(steam_profile):
     )
 
     return stats
+
+def refresh_steam_achievements(
+    steam_profile,
+):
+    total_achievements = (
+        get_total_achievements_earned(
+            steam_profile.steam_id
+        )
+    )
+
+    steam_profile.total_achievements = (
+        total_achievements
+    )
+
+    steam_profile.achievements_initialized = True
+
+    steam_profile.save()
+
+    return total_achievements
